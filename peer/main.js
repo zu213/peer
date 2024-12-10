@@ -1,16 +1,20 @@
 // main.js (Electron's main process)
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
 
 let win;
+let child;
 
 function createWindow() {
+  console.log(path.join(__dirname, 'preload.js'))
   win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true, // Allow React to use Node.js modules
+      preload: path.join(__dirname, 'preload.js'), // Correct path to the preload script
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
@@ -21,13 +25,17 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  console.log('aa')
-
   createWindow();
+});
 
-  console.log('aa')
-  // Start your backend server here
-  exec('node server/index.js', (error, stdout, stderr) => {
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+  if (child) child.kill('SIGINT');
+});
+
+ipcMain.on('start-server', () => {
+  // Start backend
+  child = exec('node server/index.js', (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
       return;
@@ -35,10 +43,10 @@ app.whenReady().then(() => {
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
   });
-  console.log('aa')
-
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+ipcMain.on('send-to-main', (event, arg) => {
+  console.log('Received event from React:', arg); // arg is the data sent from React
+  // You can send a response back if needed
+  event.reply('from-main', 'Hello from Main!');
 });
