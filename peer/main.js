@@ -33,16 +33,25 @@ app.on('window-all-closed', () => {
   if (child) child.kill('SIGINT');
 });
 
-ipcMain.on('start-server', () => {
+ipcMain.on('start-server', (event) => {
   // Start backend
   child = exec('node server/index.js', (error, stdout, stderr) => {
     if (error) {
       console.error(`exec error: ${error}`);
+      event.reply('from-main', error);
       return;
     }
     console.log(`stdout: ${stdout}`);
+    event.reply('from-main', stdout);
     console.error(`stderr: ${stderr}`);
+    event.reply('from-main', stderr);
+
   });
+
+});
+
+ipcMain.on('kill-server', (event) => {
+  if (child) child.kill('SIGINT');
 });
 
 ipcMain.on('send-to-main', (event, arg) => {

@@ -1,25 +1,60 @@
 import './App.css';
-
-const pingServer = () => {
-  console.log('aaaa')
-  fetch('http://localhost:5000/', {
-    method: 'GET',
-  })
-    .then((response) => response.json())
-    .then((data) => console.log(data));
-};
-
-const sendToElectron = () => {
-  console.log(window.electron)
-  window.electron.sendToMain('Hello from React!');
-};
+import { useState, useEffect } from 'react';
 
 function App() {
+  const [serverMessages, setServerMessages] = useState('')
+  const [electronMessages, setElectonMessages] = useState('')
+
+  useEffect(() => {
+    window.electron.onFromMain((event, message) => {
+      console.log(message)
+      setElectonMessages(message);
+    });
+  }, []);
+
+  
+  const sendToElectron = () => {
+    console.log(window.electron)
+    window.electron.sendToMain('Hello from React!');
+  };
+
+  const startServer = () => {
+    window.electron.startServer()
+  }
+
+  const killServer = () => {
+    window.electron.killServer()
+  }
+
+  const pingServer = async () => {
+    try{
+      const response = await fetch('http://localhost:5000/', {
+        method: 'GET',
+      })
+      const data = await response.text()
+      setServerMessages(data)
+    }catch(e){
+      setServerMessages(e)
+    }
+
+
+  };
+
+
   return (
     <div className="App">
-          <button onClick={sendToElectron}>click me !</button>
-
-          <button onClick={pingServer}>click me !</button>
+      <div>
+        <button onClick={sendToElectron}>message elctron</button>
+        <button onClick={startServer}>start server!</button>
+        <button onClick={pingServer}>ping server</button>
+        <button onClick={killServer}>kill server</button>
+      </div>
+      <div>
+        <textarea value={electronMessages}></textarea>
+      </div>
+      <div>
+        <textarea value={serverMessages}></textarea>
+      </div>
     </div>
   );
 }
