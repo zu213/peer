@@ -2,8 +2,9 @@
 
 When finished will be an electron app that allows users to connect generically, starting their own api servers and hopefully talking directly.
 
-TODO: 
-- CLEAN UP UI
-- POTENTIALLY MAKE PORT AN INPUT
+Currently contains:
+- TEMPLATE FOR A FRONTEND THAT CNA START A SERVER AND MESSAGE IT
 
-- THEN SANCTION OFF AS TEMPALTE AND MAKE MESSAGING SERVICE POTENTIALLY.
+TODO: 
+- POTENTIALLY MAKE PORT AN INPUT
+- THEN SANCTION OFF AS TEMPLATE AND MAKE MESSAGING SERVICE POTENTIALLY.

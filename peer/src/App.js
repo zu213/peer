@@ -24,7 +24,7 @@ function App() {
 
   
   const sendToElectron = () => {
-    setElectonMessages((currentMessage) => `${currentMessage} ${currentMessage ? "\n\n" : ""} SENT: "Hello from React!"`);
+    setElectonMessages((currentMessage) => `${currentMessage} ${currentMessage ? "\n" : ""}SENT: "Hello from React!"`);
     window.electron.sendToMain('Hello from React!');
   };
 
@@ -51,23 +51,25 @@ function App() {
 
   return (
     <div className="App">
-      <div>
-        <button onClick={sendToElectron}>message elctron</button>
-        <button onClick={startServer}>start server!</button>
+      <h1> Peer template</h1>
+      <h3> for starting local server that can be messaged </h3>
+      <div className='button-holder'>
+        <button onClick={sendToElectron}>message electron</button>
+        <button onClick={startServer}>start server</button>
         <button onClick={pingServer}>ping server</button>
         <button onClick={killServer}>kill server</button>
       </div>
-      <div>
-        <label for="electronMessages">Electron messages</label>
-        <textarea id="electronMessages" value={electronMessages}></textarea>
+      <div className='message-handler'>
+        <div>Electron messages</div>
+        <textarea id="electronMessages" value={electronMessages} readOnly cols="70" rows="50"></textarea>
       </div>
-      <div>
-        <label for="serverMessages">Server messages</label>
-        <textarea id="serverMessages" value={serverMessages}></textarea>
+      <div className='message-handler'>
+        <div>Server messages</div>
+        <textarea id="serverMessages" value={serverMessages} readOnly cols="70" rows="50"></textarea>
       </div>
-      <div>
-        <label for="serverLogs">Server logs</label>
-        <textarea id="serverLogs" value={serverLogs}></textarea>
+      <div className='message-handler'>
+        <div>Server logs</div>
+        <textarea id="serverLogs" value={serverLogs} readOnly cols="70" rows="50"></textarea>
       </div>
     </div>
   );
