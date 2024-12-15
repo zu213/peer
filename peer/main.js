@@ -1,7 +1,7 @@
 // main.js (Electron's main process)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
 let win;
 let child;
@@ -30,32 +30,57 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
-  if (child) child.kill('SIGINT');
+  if (child) {
+    child.kill('SIGINT');
+    child = null;
+  }
 });
 
 ipcMain.on('start-server', (event) => {
   // Start backend
-  child = exec('node server/index.js', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      event.reply('from-main', error);
-      return;
-    }
-    console.log(`stdout: ${stdout}`);
-    event.reply('from-main', stdout);
-    console.error(`stderr: ${stderr}`);
-    event.reply('from-main', stderr);
+  if(child) {
+    console.error('Child server already exists!!')
+    event.reply('from-main', `Child server already exists!!`);
+    return
+  }
 
+  child = spawn('node', ['server/index.js'])
+  
+  child.stdout.on('data', (data) => {
+    const logMessage = data.toString();
+    console.log(`Child stdout: ${logMessage}`); 
+    win.webContents.send('log-message', logMessage);
+  });
+
+  child.stderr.on('data', (data) => {
+    const errorMessage = data.toString();
+    console.error(`Child stderr: ${errorMessage}`);
+    win.webContents.send('log-message', `Error: ${errorMessage}`);
+  });
+
+  child.on('close', () => {
+    console.log(`Child process exited.`);
+    event.reply('from-main', `Child process exited.`);
+    child = null;
+  });
+
+  child.on('exit', () => {
+    console.log(`Child process exited.`);
+    event.reply('from-main', `Child process exited.`);
+    child = null;
   });
 
 });
 
-ipcMain.on('kill-server', (event) => {
-  if (child) child.kill('SIGINT');
+ipcMain.on('kill-server', () => {
+  if (child) {
+    child.kill('SIGINT');
+    child = null;
+  }
 });
 
 ipcMain.on('send-to-main', (event, arg) => {
-  console.log('Received event from React:', arg); // arg is the data sent from React
-  // You can send a response back if needed
-  event.reply('from-main', 'Hello from Main!');
+  // generic tempalte for call and response messages
+  console.log('Received event from React:', arg);
+  event.reply('from-main', arg);
 });
