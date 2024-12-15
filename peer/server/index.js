@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 
-const PORT = 5000;
+const PORT = process.argv[2] || 3000;
 const timeToLive = 1
 // Create an Express application
 const app = express();

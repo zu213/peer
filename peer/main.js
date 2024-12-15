@@ -5,6 +5,7 @@ const { spawn } = require('child_process');
 
 let win;
 let child;
+let PORT;
 
 function createWindow() {
   console.log(path.join(__dirname, 'preload.js'))
@@ -22,6 +23,12 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
   });
+}
+
+function generateRandomPort() {
+  const min = 1024; // Minimum port number (lower ports are reserved for system use)
+  const max = 65535; // Maximum port number
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 app.whenReady().then(() => {
@@ -44,7 +51,12 @@ ipcMain.on('start-server', (event) => {
     return
   }
 
-  child = spawn('node', ['server/index.js'])
+  // A var for now as may add retries on different ports later
+  var tempPort = generateRandomPort()
+  
+  PORT = tempPort
+
+  child = spawn('node', ['server/index.js', tempPort])
   
   child.stdout.on('data', (data) => {
     const logMessage = data.toString();
@@ -65,11 +77,10 @@ ipcMain.on('start-server', (event) => {
   });
 
   child.on('exit', () => {
-    console.log(`Child process exited.`);
-    event.reply('from-main', `Child process exited.`);
     child = null;
   });
 
+  PORT = tempPort
 });
 
 ipcMain.on('kill-server', () => {
@@ -84,3 +95,7 @@ ipcMain.on('send-to-main', (event, arg) => {
   console.log('Received event from React:', arg);
   event.reply('from-main', arg);
 });
+
+ipcMain.handle('get-server-port', () => {
+  return PORT
+})

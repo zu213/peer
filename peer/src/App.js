@@ -5,6 +5,7 @@ function App() {
   const [serverMessages, setServerMessages] = useState('')
   const [electronMessages, setElectonMessages] = useState('')
   const [serverLogs, setServerLogs] = useState('')
+  const [port, setPort] = useState('No port set')
 
   useEffect(() => {
     // These could use the same stream but nice to seperate one for direct messages and one for messages received from server child process
@@ -14,6 +15,7 @@ function App() {
 
     window.electron.receiveLog(((_, logMessage) => {
       setServerLogs((previousLogs) => previousLogs ? previousLogs + '\n' + logMessage: logMessage)
+      window.electron.getServerPort().then((data) => {console.log(data); return data ? setPort(data) : "No server setup"})
     }));
 
     return () => {
@@ -38,7 +40,8 @@ function App() {
 
   const pingServer = async () => {
     try{
-      const response = await fetch('http://localhost:5000/', {
+      console.log(port)
+      const response = await fetch(`http://localhost:${port}/`, {
         method: 'GET',
       })
       const data = await response.text()
@@ -58,6 +61,9 @@ function App() {
         <button onClick={startServer}>start server</button>
         <button onClick={pingServer}>ping server</button>
         <button onClick={killServer}>kill server</button>
+      </div>
+      <div>
+        PORT: {port}
       </div>
       <div className='message-handler'>
         <div>Electron messages</div>
