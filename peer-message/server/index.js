@@ -1,11 +1,12 @@
-// Import the Express module
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser')
 
 const PORT = process.argv[2] || 3000;
-const timeToLive = 1
-// Create an Express application
+const timeToLive = 20
 const app = express();
+const jsonParser = bodyParser.json()
+
 let lastActivityTime = Date.now();
 const inactivityTimeout = timeToLive * 60 * 1000;
 
@@ -14,15 +15,17 @@ function checkInactivity() {
   console.log(`Time since last message: ${(currentTime - lastActivityTime)/ 1000} seconds`)
   if (currentTime - lastActivityTime >= inactivityTimeout) {
     console.log(`No activity for ${timeToLive} minutes. Terminating child process...`);
-    process.exit();  // Terminate the child process
+    process.exit();
   }
 }
 
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('Hello, World! Welcome to the Express server!');
-  lastActivityTime  = Date.now()
+app.post('/',jsonParser, (req, res) => {
+  // Message has been recieved send it to electron app
+  console.log(req.body)
+  res.send('Message received successfully');
+  lastActivityTime = Date.now()
 });
 
 app.listen(PORT, () => {

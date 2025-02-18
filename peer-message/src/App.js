@@ -7,11 +7,15 @@ function App() {
   const [serverLogs, setServerLogs] = useState('N/A')
   const [receivedMessages, setReceivedMessages] = useState('')
   const [sendTo, setSendTo] = useState('')
+  const [messageToSend, setMessageToSend] = useState('')
   const [port, setPort] = useState('No port set')
 
   useEffect(() => {
-    // These could use the same stream but nice to seperate one for direct messages and one for messages received from server child process
+    // This is were messages from server a received/processed
     window.electron.onFromMain((_, message) => {
+      if(message){
+        setReceivedMessages((old) => old + '\n' + message)
+      }
       setElectonState(message);
     });
 
@@ -26,12 +30,6 @@ function App() {
     };
   }, []);
 
-  
-  const sendToElectron = () => {
-    setElectonState((currentMessage) => `${currentMessage} ${currentMessage ? "\n" : ""}SENT: "Hello from React!"`);
-    window.electron.sendToMain('Hello from React!');
-  };
-
   const startServer = () => {
     window.electron.startServer()
   }
@@ -40,36 +38,39 @@ function App() {
     window.electron.killServer()
   }
 
-  const pingServer = async () => {
+  const sendMessage = async () => {
     try{
-      console.log(port)
-      await fetch(`http://localhost:${port}/`, {
-        method: 'GET',
+      const response = await fetch(`http://localhost:${sendTo}/`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({message: messageToSend ,from: port})
       })
-      //await response.text()
+      const text = await response.text()
+      // Check if the process is a child process ending here tbd
       setServerState("Server is healthy")
     }catch(e){
       setServerState(`Server has errored: ${e}`)
     }
-  };
-
-  const sendMessage = () => {
-    console.log(sendTo)
   }
 
   const changeSentTo = (e) => {
-    setSendTo(e.target.innerText)
+    console.log(e.target.value)
+    setSendTo(e.target.value)
   }
 
+  const changeMessageToSend = (e) => {
+    setMessageToSend(e.target.value)
+  }
 
   return (
     <div className="App">
       <h1> Peer template</h1>
       <h3> for starting local server that can be messaged </h3>
       <div className='button-holder'>
-        <button onClick={sendToElectron}>message electron</button>
         <button onClick={startServer}>start server</button>
-        <button onClick={pingServer}>ping server</button>
         <button onClick={killServer}>kill server</button>
       </div>
       <div>
@@ -91,7 +92,7 @@ function App() {
       </div>
       <div className='message-sending'>
         <div>Send messsages</div>
-        <textarea id="sendMessage" cols="70" rows="50"></textarea>
+        <textarea id="sendMessage" cols="70" rows="50" onChange={changeMessageToSend}></textarea>
       </div>
       <div className='message-received'>
         <div>Received messages</div>

@@ -13,7 +13,7 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Correct path to the preload script
+      preload: path.join(__dirname, 'preload.js'), 
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -26,8 +26,8 @@ function createWindow() {
 }
 
 function generateRandomPort() {
-  const min = 1024; // Minimum port number (lower ports are reserved for system use)
-  const max = 65535; // Maximum port number
+  const min = 1024;
+  const max = 65535;
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -51,16 +51,15 @@ ipcMain.on('start-server', (event) => {
     return
   }
 
-  // A var for now as may add retries on different ports later
   var tempPort = generateRandomPort()
-  
   PORT = tempPort
 
   child = spawn('node', ['server/index.js', tempPort])
   
   child.stdout.on('data', (data) => {
     const logMessage = data.toString();
-    console.log(`Child stdout: ${logMessage}`); 
+    console.log(`Child stdout: ${logMessage}`);
+    // Chnage this to process messages from server
     win.webContents.send('log-message', logMessage);
   });
 
