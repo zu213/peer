@@ -14,6 +14,11 @@
   height: 20px;
 }
 
+.message-sending-medium textarea {
+  width: 500px;
+  height: 40px;
+}
+
 .message-sending textarea {
   width: 500px;
   height: 100px;

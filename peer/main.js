@@ -47,7 +47,7 @@ ipcMain.on('start-server', (event) => {
   // Start backend
   if(child) {
     console.error('Child server already exists!!')
-    event.reply('from-main', `Child server already exists!!`);
+    event.reply('log-message', `Child server already exists!!`);
     return
   }
 

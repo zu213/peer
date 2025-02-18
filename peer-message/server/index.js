@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 
 const PORT = process.argv[2] || 3000;
-const timeToLive = 20
+const timeToLive = 10
 const app = express();
 const jsonParser = bodyParser.json()
 
@@ -21,9 +21,9 @@ function checkInactivity() {
 
 app.use(cors());
 
-app.post('/',jsonParser, (req, res) => {
+app.post('/', jsonParser, (req, res) => {
   // Message has been recieved send it to electron app
-  console.log(req.body)
+  console.log(JSON.stringify(req.body))
   res.send('Message received successfully');
   lastActivityTime = Date.now()
 });
@@ -32,5 +32,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-// Start the heartbeat, dies after X mins
 setInterval(checkInactivity, timeToLive * 10000);

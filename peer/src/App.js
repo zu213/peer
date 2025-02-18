@@ -15,7 +15,7 @@ function App() {
 
     window.electron.receiveLog(((_, logMessage) => {
       setServerLogs((previousLogs) => previousLogs ? previousLogs + '\n' + logMessage: logMessage)
-      window.electron.getServerPort().then((data) => {console.log(data); return data ? setPort(data) : "No server setup"})
+      window.electron.getServerPort().then((data) => data ? setPort(data) : "No server setup")
     }));
 
     return () => {

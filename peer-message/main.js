@@ -60,7 +60,16 @@ ipcMain.on('start-server', (event) => {
     const logMessage = data.toString();
     console.log(`Child stdout: ${logMessage}`);
     // Chnage this to process messages from server
-    win.webContents.send('log-message', logMessage);
+    try{
+      const parsedMessage = JSON.parse(logMessage)
+      if(parsedMessage){
+        win.webContents.send('from-main', logMessage);
+      }else{
+        win.webContents.send('log-message', logMessage);
+      }
+    }catch(_){
+      win.webContents.send('log-message', logMessage);
+    }   
   });
 
   child.stderr.on('data', (data) => {
@@ -71,7 +80,7 @@ ipcMain.on('start-server', (event) => {
 
   child.on('close', () => {
     console.log(`Child process exited.`);
-    event.reply('from-main', `Child process exited.`);
+    event.reply('log-message', `Child process exited.`);
     child = null;
   });
 
@@ -90,8 +99,6 @@ ipcMain.on('kill-server', () => {
 });
 
 ipcMain.on('send-to-main', (event, arg) => {
-  // generic tempalte for call and response messages
-  console.log('Received event from React:', arg);
   event.reply('from-main', arg);
 });
 

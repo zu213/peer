@@ -2,10 +2,8 @@ import './App.css';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [serverState, setServerState] = useState('NOT SETUP')
-  const [electronState, setElectonState] = useState('N/A')
-  const [serverLogs, setServerLogs] = useState('N/A')
-  const [receivedMessages, setReceivedMessages] = useState('')
+  const [serverLogs, setServerLogs] = useState('"Server not setup yet"')
+  const [receivedMessages, setReceivedMessages] = useState('Start of log:')
   const [sendTo, setSendTo] = useState('')
   const [messageToSend, setMessageToSend] = useState('')
   const [port, setPort] = useState('No port set')
@@ -14,14 +12,23 @@ function App() {
     // This is were messages from server a received/processed
     window.electron.onFromMain((_, message) => {
       if(message){
-        setReceivedMessages((old) => old + '\n' + message)
+        try{
+          const parsedMessage = JSON.parse(message)
+          console.log(parsedMessage)
+          if(!parsedMessage.from){
+            parsedMessage.from = 'Anonymous'
+          }
+          setReceivedMessages((old) => `${old} \n Recieved message from ${parsedMessage.from}: "${parsedMessage.message}"`)
+        }catch(e){
+          setReceivedMessages((old) => `${old} \n Error parsing message ${e}`)
+        }
+      
       }
-      setElectonState(message);
     });
 
     window.electron.receiveLog(((_, logMessage) => {
       setServerLogs(logMessage)
-      window.electron.getServerPort().then((data) => {console.log(data); return data ? setPort(data) : "No server setup"})
+      window.electron.getServerPort().then((data) => data ? setPort(data) : "No server setup")
     }));
 
     return () => {
@@ -48,12 +55,13 @@ function App() {
         },
         body: JSON.stringify({message: messageToSend ,from: port})
       })
-      const text = await response.text()
+      await response.text()
+      setReceivedMessages((old) => `${old}\nSent message to ${sendTo}: "${messageToSend}"`)
       // Check if the process is a child process ending here tbd
-      setServerState("Server is healthy")
     }catch(e){
-      setServerState(`Server has errored: ${e}`)
+      setReceivedMessages((old) => `${old}\nMessage failed to send: ${e}`)
     }
+    setMessageToSend("")
   }
 
   const changeSentTo = (e) => {
@@ -67,20 +75,14 @@ function App() {
 
   return (
     <div className="App">
-      <h1> Peer template</h1>
-      <h3> for starting local server that can be messaged </h3>
+      <h1> Messaging App</h1>
+      <h3> This app allows you to message pother by putting their port number in the "Send to" box</h3>
       <div className='button-holder'>
         <button onClick={startServer}>start server</button>
         <button onClick={killServer}>kill server</button>
       </div>
       <div>
-        PORT: {port}
-      </div>
-      <div>
-        Last Electron message: {electronState}
-      </div>
-      <div>
-        Local server setup: {serverState}
+        LAST PORT: {port}
       </div>
       <div>
         Last server log: {serverLogs}
@@ -90,9 +92,9 @@ function App() {
         <div>Send to:</div>
         <textarea id="sendTo" cols="70" rows="1" onChange={changeSentTo}></textarea>
       </div>
-      <div className='message-sending'>
+      <div className='message-sending-medium'>
         <div>Send messsages</div>
-        <textarea id="sendMessage" cols="70" rows="50" onChange={changeMessageToSend}></textarea>
+        <textarea id="sendMessage" cols="70" rows="50" value={messageToSend} onChange={changeMessageToSend}></textarea>
       </div>
       <div className='message-received'>
         <div>Received messages</div>
