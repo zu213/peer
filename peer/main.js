@@ -8,26 +8,28 @@ let child;
 let PORT;
 
 function createWindow() {
+  // Preload the window, this is where you cna add window theming
   console.log(path.join(__dirname, 'preload.js'))
   win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.join(__dirname, 'public', 'logo.png'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Correct path to the preload script
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
     },
   });
 
-  win.loadURL('http://localhost:3000'); // Load React app
+  win.loadURL('http://localhost:3000');
   win.on('closed', () => {
     win = null;
   });
 }
 
 function generateRandomPort() {
-  const min = 1024; // Minimum port number (lower ports are reserved for system use)
-  const max = 65535; // Maximum port number
+  const min = 1024;
+  const max = 65535;
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -53,9 +55,7 @@ ipcMain.on('start-server', (event) => {
 
   // A var for now as may add retries on different ports later
   var tempPort = generateRandomPort()
-  
   PORT = tempPort
-
   child = spawn('node', ['server/index.js', tempPort])
   
   child.stdout.on('data', (data) => {
@@ -91,7 +91,7 @@ ipcMain.on('kill-server', () => {
 });
 
 ipcMain.on('send-to-main', (event, arg) => {
-  // generic tempalte for call and response messages
+  // generic template for call and response messages
   console.log('Received event from React:', arg);
   event.reply('from-main', arg);
 });

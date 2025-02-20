@@ -2,7 +2,7 @@ import './App.css';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [serverLogs, setServerLogs] = useState('"Server not setup yet"')
+  const [serverLogs, setServerLogs] = useState('Server not setup yet')
   const [receivedMessages, setReceivedMessages] = useState('Start of log:')
   const [sendTo, setSendTo] = useState('')
   const [messageToSend, setMessageToSend] = useState('')
@@ -14,15 +14,14 @@ function App() {
       if(message){
         try{
           const parsedMessage = JSON.parse(message)
-          console.log(parsedMessage)
           if(!parsedMessage.from){
             parsedMessage.from = 'Anonymous'
           }
           setReceivedMessages((old) => `${old} \n Recieved message from ${parsedMessage.from}: "${parsedMessage.message}"`)
         }catch(e){
-          setReceivedMessages((old) => `${old} \n Error parsing message ${e}`)
+          setServerLogs(message)
+          window.electron.getServerPort().then((data) => data ? setPort(data) : "No server setup")
         }
-      
       }
     });
 
@@ -53,7 +52,7 @@ function App() {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({message: messageToSend ,from: port})
+        body: JSON.stringify({message: messageToSend ,from: port === 'No port set' ? 'Anonymous' : port})
       })
       await response.text()
       setReceivedMessages((old) => `${old}\nSent message to ${sendTo}: "${messageToSend}"`)
@@ -65,7 +64,6 @@ function App() {
   }
 
   const changeSentTo = (e) => {
-    console.log(e.target.value)
     setSendTo(e.target.value)
   }
 
@@ -76,31 +74,35 @@ function App() {
   return (
     <div className="App">
       <h1> Messaging App</h1>
-      <h3> This app allows you to message pother by putting their port number in the "Send to" box</h3>
+      <h4> This app allows you to message other users on the same app by setting up its own 
+        server. When you start the server you'll be given a port number that is used to message
+        others.</h4>
       <div className='button-holder'>
         <button onClick={startServer}>start server</button>
         <button onClick={killServer}>kill server</button>
       </div>
       <div>
-        LAST PORT: {port}
+        LAST PORT: <span className='server-info'>{port}</span>
       </div>
       <div>
-        Last server log: {serverLogs}
+        Last server log: <span className='server-info'>{serverLogs}</span>
       </div>
 
-      <div className='message-sending-small'>
-        <div>Send to:</div>
-        <textarea id="sendTo" cols="70" rows="1" onChange={changeSentTo}></textarea>
+      <div className='messaging-container'>
+        <div className='message-sending-small'>
+          <div className='textbox-title inline'>Send to:</div>
+          <textarea className='inline' id="sendTo" cols="70" rows="1" onChange={changeSentTo}></textarea>
+        </div>
+        <div className='message-sending-medium'>
+          <div className='textbox-title'>Type message here:</div>
+          <textarea id="sendMessage" cols="70" rows="50" value={messageToSend} onChange={changeMessageToSend}></textarea>
+        </div>
+        <div className='message-received'>
+          <div className='textbox-title'>Received messages</div>
+          <textarea id="receivedMessages" value={receivedMessages} readOnly cols="70" rows="50"></textarea>
+        </div>
+        <button onClick={sendMessage}>Send message</button>
       </div>
-      <div className='message-sending-medium'>
-        <div>Send messsages</div>
-        <textarea id="sendMessage" cols="70" rows="50" value={messageToSend} onChange={changeMessageToSend}></textarea>
-      </div>
-      <div className='message-received'>
-        <div>Received messages</div>
-        <textarea id="receivedMessages" value={receivedMessages} readOnly cols="70" rows="50"></textarea>
-      </div>
-      <button onClick={sendMessage}>Send message</button>
 
     </div>
   );

@@ -9,9 +9,11 @@ let PORT;
 
 function createWindow() {
   console.log(path.join(__dirname, 'preload.js'))
+  // TODO ADD WINOD THEMING
   win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.join(__dirname, 'public', 'logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), 
       nodeIntegration: false,
@@ -59,7 +61,6 @@ ipcMain.on('start-server', (event) => {
   child.stdout.on('data', (data) => {
     const logMessage = data.toString();
     console.log(`Child stdout: ${logMessage}`);
-    // Chnage this to process messages from server
     try{
       const parsedMessage = JSON.parse(logMessage)
       if(parsedMessage){

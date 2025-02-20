@@ -1,12 +1,22 @@
 .App {
   text-align: center;
+  padding-left: 5%;
+  padding-right: 5%;
 }
+
 .button-holder {
   margin-bottom: 1px;
+  height: 30px;
 }
 
 .button-holder button {
-  margin: 5px;
+  padding: 3px 10px 3px 10px;
+  display: inline-block;
+}
+
+.message-sending-small {
+  padding: 6px;
+  vertical-align: middle;
 }
 
 .message-sending-small textarea {
@@ -14,19 +24,43 @@
   height: 20px;
 }
 
+.message-sending-medium {
+  padding: 3px;
+}
+
 .message-sending-medium textarea {
-  width: 500px;
+  width: 100%;
   height: 40px;
 }
 
-.message-sending textarea {
-  width: 500px;
-  height: 100px;
+.message-received {
+  padding: 3px;
 }
 
 .message-received textarea {
-  width: 500px;
+  width: 100%;
   height: 100px;
+}
+
+.textbox-title {
+  text-align: left;
+  font-weight: bold;
+}
+
+.inline {
+  vertical-align: middle;
+  display: inline;
+}
+
+.messaging-container {
+  position: relative;
+  width: 70%;
+  left:15%
+}
+
+.messaging-container button {
+  width: 40%;
+  height: 35px;
 }
 
 h1 {
@@ -35,4 +69,27 @@ h1 {
 
 h2 {
   margin: 2px;
+}
+
+button {
+  margin: 5px;
+  position: relative;
+  top: 0px;
+  padding: 3px 10px 3px 10px;
+  border-radius: 0px;
+  border-width: 0.2px;
+  display: inline-block;
+  border-color: rgb(129, 129, 129);
+  background-color: rgb(244, 244, 244);
+  border-bottom: 2px solid rgb(69, 68, 68);
+  font-family: 'VT323', monospace;
+}
+
+button:hover {
+  background-color: rgb(219, 219, 219);
+}
+
+button:active {
+  top: 2px;
+  border-bottom: 0.2px solid rgb(69, 68, 68);
 }
