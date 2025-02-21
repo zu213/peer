@@ -50,3 +50,7 @@ This demonstrates a simple, decentralised messaging system—allowing communicat
 - No centralised server – Users host their own communication.
 - Customisable – Extend the template to build more complex apps.
 - Privacy-focused – Messages stay between peers with no direct middleman.
+
+### Future
+- Add gif of messaging service
+- Make app easier to run
