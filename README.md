@@ -1,17 +1,52 @@
 # 📶 Peer to peer website (kinda)
 
-When finished will be an electron app that allows users to connect generically, starting their own api servers and hopefully talking directly.
+This repository contains <b>Electron app templates</b> that allow users to set up their own <b>peer-to-peer servers</b> directly from an app, eliminating the need for a centralised server.
 
-The key thing about this repo is the elctron apps start upa server themselves this allows them to communivcate directly.
+<img src="./images/messagesent.png" alt="Messaging in peer-message"/>
 
-Usage locally:
-- Nviagte to the template or the messaging app
-- Run npm i
-- run npm start
-- open another terminal
-- Nviagte to the template or the messaging app
-- run npm run electron the app shpuld start up
+## Setting up locally
 
-The template gives....
+- Navigate to the template(peer) or the messaging app(peer-message) folder.
+- Run `npm i`.
+- Run `npm start`.
+- Open another terminal in the same folder.
+- Run `npm run electron`, the app should start up.
 
-The message folder is an example of utilising the template to create an electron app
+If using the messaging app you can open another terminal and do the same, 
+these windows will be able to message each other.
+
+## Project structure
+
+This repo is split into two parts:
+
+### Peer
+
+This is a <b>base template</b> for Electron apps that set up their own local servers.
+Once running, users can start their own server and ping it through simple UI buttons.
+
+The template is designed for easy extension, making it simple to build custom systems on top.
+An example of this is peer-message, which extends this template to enable peer-to-peer messaging.
+
+<img src="./images/template.png" alt="peer template" width="500"/>
+
+## Peer-message
+
+This is the <b>messaging app</b>, an example of an extension of the template. It allows users to message each other using their own individual servers.
+
+#### How It Works
+
+1) The receiver must start their own server.
+2) The sender enters the receiver’s port number in the "Send To" box.
+3) The sender types a message in the "Type message here" box.
+4) The sender presses "Send".
+5) The receiver gets the message instantly.
+
+This demonstrates a simple, decentralised messaging system—allowing communication without relying on a central server.
+
+<img src="./images/messaging.png" alt="peer-message" width="500"/>
+
+## Why Use This?
+
+- No centralised server – Users host their own communication.
+- Customisable – Extend the template to build more complex apps.
+- Privacy-focused – Messages stay between peers with no direct middleman.
